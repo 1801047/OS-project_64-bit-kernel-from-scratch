@@ -1,0 +1,137 @@
+/* using System;
+using System.Collections.Generic;
+using System.Text;
+using Sys = Cosmos.System;
+
+namespace CosmosKernel_vc
+{
+    public class Kernel : Sys.Kernel
+    {
+
+        protected override void BeforeRun()
+        {
+            Console.WriteLine("Cosmos booted successfully. Type a line of text to get it echoed back.");
+        }
+
+        protected override void Run()
+        {
+            Console.Write("Input: ");
+            var input = Console.ReadLine();
+            Console.Write("Text typed: ");
+            Console.WriteLine(input);
+        }
+    }
+}
+*/
+using System;
+using System.Collections.Generic;
+using System.Text;
+using Sys = Cosmos.System;
+
+namespace CosmosKernel_vc
+{
+    public class Kernel : Sys.Kernel
+    {
+        private Dictionary<string, string> files; // Dictionary to store file name and content
+
+        protected override void BeforeRun()
+        {
+            Console.WriteLine("Cosmos booted successfully. Type a command (create, read, write, delete) followed by a file name and content if needed.");
+            files = new Dictionary<string, string>(); // Initialize the dictionary
+        }
+
+        protected override void Run()
+        {
+            Console.Write("Command: ");
+            var command = Console.ReadLine();
+
+            string[] parts = command.Split(' ');
+            if (parts.Length < 2)
+            {
+                Console.WriteLine("Invalid command. Please provide a command and file name.");
+                return;
+            }
+
+            string action = parts[0].ToLower();
+            string fileName = parts[1];
+
+            switch (action)
+            {
+                case "create":
+                    CreateFile(fileName);
+                    break;
+                case "read":
+                    ReadFile(fileName);
+                    break;
+                case "write":
+                    if (parts.Length < 3)
+                    {
+                        Console.WriteLine("Invalid command. Please provide content to write.");
+                        return;
+                    }
+                    string content = command.Substring(action.Length + fileName.Length + 2); // Extract content after command and file name
+                    WriteFile(fileName, content);
+                    break;
+                case "delete":
+                    DeleteFile(fileName);
+                    break;
+                default:
+                    Console.WriteLine("Invalid command.");
+                    break;
+            }
+        }
+
+        private void CreateFile(string fileName)
+        {
+            if (files.ContainsKey(fileName))
+            {
+                Console.WriteLine($"File '{fileName}' already exists.");
+            }
+            else
+            {
+                files.Add(fileName, "");
+                Console.WriteLine($"File '{fileName}' created successfully.");
+            }
+        }
+
+        private void ReadFile(string fileName)
+        {
+            if (files.ContainsKey(fileName))
+            {
+                Console.WriteLine($"Content of file '{fileName}': {files[fileName]}");
+            }
+            else
+            {
+                Console.WriteLine($"File '{fileName}' does not exist.");
+            }
+        }
+
+        private void WriteFile(string fileName, string content)
+        {
+            if (files.ContainsKey(fileName))
+            {
+                files[fileName] = content;
+                Console.WriteLine($"Content written to file '{fileName}' successfully.");
+            }
+            else
+            {
+                Console.WriteLine($"File '{fileName}' does not exist.");
+            }
+        }
+
+        private void DeleteFile(string fileName)
+        {
+            if (files.ContainsKey(fileName))
+            {
+                files.Remove(fileName);
+                Console.WriteLine($"File '{fileName}' deleted successfully.");
+            }
+            else
+            {
+                Console.WriteLine($"File '{fileName}' does not exist.");
+            }
+        }
+    }
+}
+
+
